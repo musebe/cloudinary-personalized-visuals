@@ -1,36 +1,127 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎯 Personalize E-commerce & Marketing Visuals
 
-## Getting Started
+> Customize product banners using AI overlays and generative fill for enhanced e-commerce engagement.
 
-First, run the development server:
+![Personalize Demo Preview](preview.png)
+
+---
+
+### 🧠 What This Demo Shows
+
+In this demo, we personalize visual content for e-commerce and marketing using:
+
+* **Generative Replace**
+  Swap scene elements using natural language prompts — e.g., “replace the chair with a couch.”
+
+* **Image Overlays**
+  Dynamically add call-to-actions, product names, promo badges, or seasonal labels.
+
+These tools enable marketers and designers to instantly customize visuals per audience or campaign using modern frontend technologies.
+
+---
+
+## ✨ Features
+
+* Upload & personalize product visuals with generative AI
+* Add branding overlays, promo tags, and seasonal frames
+* Leverage generative fill for image resizing & enhancement
+* Compare original vs personalized visuals interactively
+* Built with modern web tools: **Next.js 15**, **Tailwind CSS 4**, **shadcn/ui**, **Motion.dev**
+
+---
+
+## 🛠 Built With
+
+[![Next.js](https://img.shields.io/badge/Next.js-15-blue?logo=next.js)](https://nextjs.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38BDF8?logo=tailwindcss)](https://tailwindcss.com/)
+[![Motion.dev](https://img.shields.io/badge/Motion.dev-animations-purple)](https://motion.dev)
+[![shadcn/ui](https://img.shields.io/badge/shadcn/ui-components-black)](https://ui.shadcn.com/)
+[![License](https://img.shields.io/github/license/yourname/personalize-visuals)](./LICENSE)
+
+---
+
+## 📚 Table of Contents
+
+* [Prerequisites](#prerequisites)
+* [Local Setup](#local-setup)
+* [.env Configuration](#env-configuration)
+* [Available Scripts](#available-scripts)
+* [Deployment](#deployment)
+* [Useful Links](#useful-links)
+
+---
+
+## ✅ Prerequisites
+
+* **Node.js 18+**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+nvm install 20
+nvm use 20
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> Optional: Setup accounts for image hosting (e.g., Cloudinary) or generative APIs.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚀 Local Setup
 
-## Learn More
+```bash
+git clone https://github.com/yourname/personalize-visuals.git
+cd personalize-visuals
 
-To learn more about Next.js, take a look at the following resources:
+npm install
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+cp .env.example .env.local
+# → Add your API keys and hosting credentials if needed
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+npm run dev
+# → Visit http://localhost:3000
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## ⚙️ .env Configuration
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Create a `.env.local` file with:
+
+| Key                     | Description                              |
+| ----------------------- | ---------------------------------------- |
+| `NEXT_PUBLIC_API_BASE`  | Base URL for your backend/generative API |
+| `API_SECRET_KEY`        | Server-side key for protected endpoints  |
+| `CLOUDINARY_CLOUD_NAME` | (Optional) Cloudinary cloud name         |
+
+> ✅ Only expose keys with `NEXT_PUBLIC_` prefix to the browser.
+
+---
+
+## 📜 Available Scripts
+
+| Script          | Description              |
+| --------------- | ------------------------ |
+| `npm run dev`   | Start the dev server     |
+| `npm run build` | Build for production     |
+| `npm run lint`  | Run TypeScript & ESLint  |
+| `npm run start` | Start in production mode |
+
+---
+
+## 🌍 Deployment
+
+1. Push to GitHub
+2. Import into [Vercel](https://vercel.com/)
+3. Set required environment variables
+4. Click **Deploy**
+
+---
+
+## 🔗 Useful Links
+
+* 🎨 [Cloudinary Generative Fill](https://cloudinary.com/documentation/generative_ai_transformations)
+* 🧰 [shadcn/ui](https://ui.shadcn.com)
+* 🎬 [Motion.dev](https://motion.dev)
+* ⚡ [Next.js App Router Docs](https://nextjs.org/docs/app)
+
+---
+
+**Turn your static product shots into dynamic marketing visuals. 🚀**
