@@ -1,6 +1,8 @@
-# 🎯 Personalize E-commerce & Marketing Visuals
+# 🎯 Personalize E-commerce and Marketing Visuals in Next.js with Generative Replace and Overlays
 
-> Customize product banners using AI overlays and generative fill for enhanced e-commerce engagement.
+> personalize visual content for marketing or product displays using:
+Generative Replace to swap scene elements (e.g., “replace the chair with a couch”) using natural language
+Image Overlays to dynamically add call-to-actions, product names, or promo badges
 
 ![Personalize Demo Preview](preview.png)
 
