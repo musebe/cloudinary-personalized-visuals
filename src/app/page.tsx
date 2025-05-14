@@ -1,8 +1,14 @@
 import Uploader from '@/components/Uploader';
-import ImageComparison from '@/components/ImageComparison';
+import ImageComparisonCustom from '@/components/ImageComparison';
 import TransformGallery from '@/components/TransformGallery';
+import { readAll } from '@/lib/db';
+import { TransformRecord } from '@/lib/types';
 
-export default function Home() {
+export default async function Home() {
+  // Server-only: read transforms.json
+  const all: TransformRecord[] = await readAll();
+  const latest = all[0];
+
   return (
     <main className='container mx-auto px-4 sm:px-8 py-20 space-y-20'>
       {/* Hero / Branding */}
@@ -22,13 +28,17 @@ export default function Home() {
           <Uploader />
         </div>
         <div className='md:w-1/2 hidden md:block'>
-          {/* Optional: show latest transformation result */}
-          <ImageComparison />
+          {latest && (
+            <ImageComparisonCustom
+              before={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${latest.publicId}.png`}
+              after={latest.transformedUrl}
+            />
+          )}
         </div>
       </section>
 
-      {/* Recent Transforms */}
-      <TransformGallery />
+      {/* Recent Transforms (client-only) */}
+      <TransformGallery initial={all} />
     </main>
   );
 }

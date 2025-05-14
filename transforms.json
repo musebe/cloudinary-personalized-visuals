@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "be8590dc-19b7-4670-a908-89017cbb7d9a",
+    "publicId": "ecommerce_demo/bdhiuwfjctx9jos8kqbn",
+    "transformedUrl": "https://res.cloudinary.com/hackit-africa/image/upload/l_text:Arial_40_bold:Clearance%20Sale,co_white,g_north_west,x_132,y_42/e_gen_replace:prompt_Photo;replacement_Mirror/ecommerce_demo/bdhiuwfjctx9jos8kqbn.png",
+    "from": "Photo",
+    "to": "Mirror",
+    "overlay": "Clearance Sale",
+    "overlayMode": "text",
+    "pos": {
+      "x": 132,
+      "y": 42
+    },
+    "createdAt": 1747198316809
+  }
+]
