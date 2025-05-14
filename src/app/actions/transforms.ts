@@ -1,3 +1,4 @@
+// src/app/actions/transforms.ts
 'use server';
 
 import crypto from 'node:crypto';
@@ -5,11 +6,12 @@ import { write, readAll } from '@/lib/db';
 import { buildTransform } from '@/lib/transform';
 import { TransformRecord } from '@/lib/types';
 
-/** same addTransform, now returns the full record */
+/** Returns the new transform record after persisting it */
 export async function addTransform(
-    prev: TransformRecord | null,
-    data: FormData,
+    _prev: TransformRecord | null,
+    data: FormData
 ): Promise<TransformRecord> {
+    // ① pull form values
     const publicId = data.get('publicId') as string;
     const from = data.get('from') as string | null;
     const to = data.get('to') as string | null;
@@ -17,16 +19,23 @@ export async function addTransform(
     const overlayMode = data.get('overlayMode') as 'text' | 'image';
     const x = Number(data.get('x') ?? 0);
     const y = Number(data.get('y') ?? 0);
+    const textColor = (data.get('overlayColor') as string | null) ?? '000000';
 
-    const transformedUrl = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${buildTransform({
+    // ② build transform segment (now including textColor)
+    const segment = buildTransform({
         from: from || undefined,
         to: to || undefined,
         overlay: overlay || undefined,
         overlayMode,
         x,
         y,
-    })}${publicId}.png`;
+        textColor,
+    });
 
+    // ③ full URL
+    const transformedUrl = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${segment}${publicId}.png`;
+
+    // ④ record
     const record: TransformRecord = {
         id: crypto.randomUUID(),
         publicId,
@@ -43,8 +52,6 @@ export async function addTransform(
     return record;
 }
 
-/** unchanged */
 export async function getTransforms(limit = 20) {
-    const all = await readAll();
-    return all.slice(0, limit);
+    return (await readAll()).slice(0, limit);
 }

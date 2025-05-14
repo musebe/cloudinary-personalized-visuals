@@ -1,3 +1,5 @@
+// src/app/page.tsx
+
 import Uploader from '@/components/Uploader';
 import ImageComparisonCustom from '@/components/ImageComparison';
 import TransformGallery from '@/components/TransformGallery';
@@ -18,16 +20,19 @@ export default async function Home() {
         </h1>
         <p className='max-w-xl text-muted-foreground text-sm sm:text-base'>
           Use Cloudinary Generative Replace and Overlays to customize product
-          imagery with Next.js, Shadcn, and Motion.
+          imagery with Next.js, shadcn/ui, and Motion.
         </p>
       </section>
 
       {/* Uploader + Live Preview */}
-      <section className='md:flex gap-10'>
-        <div className='md:w-1/2'>
+      <section className='flex flex-col md:flex-row gap-10 items-start'>
+        {/* ① Uploader (client) */}
+        <div className='w-full md:w-1/2'>
           <Uploader />
         </div>
-        <div className='md:w-1/2 hidden md:block'>
+
+        {/* ② Comparison slider */}
+        <div className='w-full md:w-1/2 mt-8 md:mt-28'>
           {latest && (
             <ImageComparisonCustom
               before={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${latest.publicId}.png`}
@@ -37,7 +42,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Recent Transforms (client-only) */}
+      {/* Recent Transforms (client-only gallery) */}
       <TransformGallery initial={all} />
     </main>
   );
