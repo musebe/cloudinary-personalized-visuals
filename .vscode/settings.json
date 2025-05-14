@@ -4,6 +4,8 @@
     "ecommerce",
     "Initialise",
     "kqbn",
-    "Personalizer"
+    "Personalizer",
+    "ripc",
+    "uvsip"
   ]
 }

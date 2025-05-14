@@ -1,3 +1,15 @@
 [
-  
+  {
+    "id": "56add700-8302-49e4-8f76-920844060a59",
+    "publicId": "ecommerce_demo/qd6q75d1uvsip546ripc",
+    "transformedUrl": "https://res.cloudinary.com/hackit-africa/image/upload/e_gen_replace:from_Cup%20;to_Plate%20/ecommerce_demo/qd6q75d1uvsip546ripc.png",
+    "from": "Cup ",
+    "to": "Plate ",
+    "overlayMode": "text",
+    "pos": {
+      "x": 20,
+      "y": 20
+    },
+    "createdAt": 1747205441215
+  }
 ]
