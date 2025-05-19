@@ -1,51 +1,80 @@
-// src/lib/transform.ts
-
 /**
- * Create a Cloudinary transformation segment.
+ * Build the Cloudinary transformation segment.
  *
- * ① Generative Replace – e_gen_replace:from_<from>;to_<to>/
- * ② Optional overlay – text with background & white text, or an image layer.
+ * ▸ Generative Replace (e_gen_replace)  
+ * ▸ Optional text or image overlay, with colour, bg, gravity & offsets
  */
 export function buildTransform({
+    /* generative replace */
     from,
     to,
+
+    /* overlay */
     overlay,
     overlayMode = 'text',
+
+    /* placement */
+    gravity = 'north_west',
     x = 0,
     y = 0,
-    textColor = '000000', // badge background hex
+
+    /* style */
+    textColor = '000000',
+    bgColor,
+    fontFamily = 'Arial',
+    fontSize = 40,
+    fontWeight = 'bold',
 }: {
     from?: string;
     to?: string;
     overlay?: string;
     overlayMode?: 'text' | 'image';
+    gravity?: string;
     x?: number;
     y?: number;
     textColor?: string;
+    bgColor?: string;
+    fontFamily?: string;
+    fontSize?: number;
+    fontWeight?: 'normal' | 'bold';
 }) {
-    const parts: string[] = [];
+    const chain: string[] = [];
 
-    // ① generative replace
+    /* ① generative replace ------------------------------------------------ */
     if (from && to) {
-        parts.push(
+        chain.push(
             `e_gen_replace:from_${encodeURIComponent(from)};to_${encodeURIComponent(to)}`
         );
     }
 
-    // ② overlay layer
+    /* ② overlay ----------------------------------------------------------- */
     if (overlay) {
         if (overlayMode === 'text') {
-            // ← use Arial_40_bold instead of 60 so it’s the same size as your UI span
-            parts.push(
-                `l_text:Arial_40_bold:${encodeURIComponent(
-                    overlay
-                )},b_rgb:${textColor},co_rgb:FFFFFF,g_north_west,x_${x},y_${y}`
+            chain.push(
+                [
+                    `l_text:${encodeURIComponent(
+                        `${fontFamily}_${fontSize}_${fontWeight}`
+                    )}:${encodeURIComponent(overlay)}`,
+                    `co_rgb:${textColor}`,
+                    bgColor ? `b_rgb:${bgColor}` : '',
+                    `g_${gravity}`,
+                    `x_${x}`,
+                    `y_${y}`,
+                ]
+                    .filter(Boolean)
+                    .join(',')
             );
         } else {
-            parts.push(`l_${overlay},g_north_west,x_${x},y_${y}`);
+            chain.push(
+                [
+                    `l_${overlay}`,
+                    `g_${gravity}`,
+                    `x_${x}`,
+                    `y_${y}`,
+                ].join(',')
+            );
         }
     }
 
-    // ③ join + trailing slash
-    return parts.length ? parts.join('/') + '/' : '';
+    return chain.length ? `${chain.join('/')}/` : '';
 }

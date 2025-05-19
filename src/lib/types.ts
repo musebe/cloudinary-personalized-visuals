@@ -1,3 +1,5 @@
+//src/lib/types.ts
+
 export interface TransformRecord {
     id: string;
     publicId: string;        // original Cloudinary public ID

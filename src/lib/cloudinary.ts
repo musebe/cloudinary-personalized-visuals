@@ -1,3 +1,5 @@
+//src/lib/cloudinary.ts
+
 import { v2 as cloudinary } from 'cloudinary';
 
 /** Initialise the Cloudinary Node SDK (server-side only). */

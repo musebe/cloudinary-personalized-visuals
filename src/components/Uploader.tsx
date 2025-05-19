@@ -1,286 +1,197 @@
-// src/components/Uploader.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, PanInfo } from 'motion/react';
-import Image from 'next/image';
-import {
-  CldUploadWidget,
-  CloudinaryUploadWidgetResults,
-} from 'next-cloudinary';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
+import { Repeat, Image as ImageIcon } from 'lucide-react';
+
+import { UploadButton } from './segments/UploadButton';
+import { ReplaceControls } from './segments/ReplaceControls';
+import { OverlayControls, ColorOption } from './segments/OverlayControls';
+import { PositionSelector, Gravity } from './PositionSelector';
+import { LivePreview } from './LivePreview';
+import { SaveButton } from './SaveButton';
+
+import { buildTransform } from '@/lib/transform';
 import { addTransform } from '@/app/actions/transforms';
 
-const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
-const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!;
-
-type OverlayMode = 'text' | 'image';
-type ColorOption = { name: string; hex: string; bgClass: string };
-
-const COLORS: ColorOption[] = [
-  { name: 'Black', hex: '000000', bgClass: 'bg-black/70 text-white' },
-  { name: 'White', hex: 'FFFFFF', bgClass: 'bg-white/70 text-black' },
-  { name: 'Red', hex: 'FF0000', bgClass: 'bg-red-500 text-white' },
-  { name: 'Blue', hex: '0000FF', bgClass: 'bg-blue-500 text-white' },
-  { name: 'Green', hex: '00FF00', bgClass: 'bg-green-500 text-white' },
-];
+/* debounce helper (350 ms) */
+function useDebouncedValue<T>(value: T, delay = 350) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(id);
+  }, [value, delay]);
+  return debounced;
+}
 
 export default function Uploader() {
   const router = useRouter();
 
-  // ① Core state
-  const [publicId, setPublicId] = useState<string>('');
-  const [overlayMode, setOverlayMode] = useState<OverlayMode>('text');
-  const [overlayText, setOverlayText] = useState<string>('');
-  const [overlayImgId, setOverlayImgId] = useState<string>('');
-  const [replaceFrom, setReplaceFrom] = useState<string>('');
-  const [replaceTo, setReplaceTo] = useState<string>('');
-  const [pos, setPos] = useState<{ x: number; y: number }>({ x: 20, y: 20 });
+  /* base image */
+  const [publicId, setPublicId] = useState('');
+  const [active, setActive] = useState<'replace' | 'overlay'>('replace');
 
-  // ⑧ Toggles
-  const [enableReplace, setEnableReplace] = useState<boolean>(true);
-  const [enableOverlay, setEnableOverlay] = useState<boolean>(true);
+  /* generative replace */
+  const [repEnabled, setRepEnabled] = useState(true);
+  const [repFrom, setRepFrom] = useState('');
+  const [repTo, setRepTo] = useState('');
 
-  // ⑨ Color picker
-  const [overlayColor, setOverlayColor] = useState<ColorOption>(COLORS[0]);
+  /* overlay */
+  const [ovEnabled, setOvEnabled] = useState(true);
+  const [ovMode, setOvMode] = useState<'text' | 'image'>('text');
+  const [ovText, setOvText] = useState('');
+  const [ovImg, setOvImg] = useState('');
 
-  // Debug logs
-  useEffect(() => console.log('publicId →', publicId), [publicId]);
-  useEffect(() => console.log('overlayImgId →', overlayImgId), [overlayImgId]);
-  useEffect(() => console.log('overlayColor →', overlayColor), [overlayColor]);
+  const [ovColor, setOvColor] = useState<ColorOption>({
+    hex: '000000',
+    bgClass: 'bg-black/70 text-white',
+    name: 'Black',
+  });
+  const [ovBg, setOvBg] = useState<ColorOption>({
+    hex: 'FFFFFF',
+    bgClass: 'bg-white/70 text-black',
+    name: 'White',
+  });
 
-  // Only show badge if overlay is enabled and input exists
-  const overlayChosen =
-    enableOverlay &&
-    (overlayMode === 'text'
-      ? overlayText.trim() !== ''
-      : overlayImgId.trim() !== '');
+  const [ovFontFamily, setOvFontFamily] = useState('Arial');
+  const [ovFontSize, setOvFontSize] = useState(40);
+  const [ovFontWeight, setOvFontWeight] = useState<'normal' | 'bold'>('bold');
 
-  const buildUrl = (id: string) =>
-    `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${id}.png`;
+  const [gravity, setGravity] = useState<Gravity>('north_west');
+  const [ovX, setOvX] = useState(0);
+  const [ovY, setOvY] = useState(0);
 
-  // ⑥ Save handler
+  /* ── build base image URL (replace only) ───────────────────────────── */
+  const baseSegment = buildTransform({
+    from: repEnabled ? repFrom || undefined : undefined,
+    to: repEnabled ? repTo || undefined : undefined,
+  });
+
+  const baseUrl = publicId
+    ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${baseSegment}${publicId}.png`
+    : '';
+
+  const debouncedBaseUrl = useDebouncedValue(baseUrl);
+
+  /* overlay object for in-browser preview */
+  const overlayPreview = ovEnabled
+    ? {
+        mode: ovMode,
+        text: ovMode === 'text' ? ovText : undefined,
+        imageId: ovMode === 'image' ? ovImg : undefined,
+        textColor: ovColor.hex,
+        bgColor: ovBg.hex,
+        fontFamily: ovFontFamily,
+        fontSize: ovFontSize,
+        fontWeight: ovFontWeight,
+        gravity,
+        x: ovX,
+        y: ovY,
+      }
+    : undefined;
+
+  /* ── form submit → server action ───────────────────────────────────── */
   const handleSave = async () => {
     if (!publicId) return;
-    console.log('[Save]', {
-      publicId,
-      replaceFrom,
-      replaceTo,
-      overlayMode,
-      overlayChosen,
-      pos,
-      enableReplace,
-      enableOverlay,
-      overlayColor,
-    });
 
     const form = new FormData();
     form.set('publicId', publicId);
 
-    if (enableReplace) {
-      form.set('from', replaceFrom);
-      form.set('to', replaceTo);
-    } else {
-      form.set('from', '');
-      form.set('to', '');
-    }
+    form.set('from', repEnabled ? repFrom : '');
+    form.set('to', repEnabled ? repTo : '');
 
-    form.set('overlayMode', overlayMode);
-    if (enableOverlay) {
-      form.set('overlay', overlayMode === 'text' ? overlayText : overlayImgId);
-      form.set('overlayColor', overlayColor.hex);
-    } else {
-      form.set('overlay', '');
-      form.set('overlayColor', '');
-    }
+    form.set('overlay', ovEnabled ? (ovMode === 'text' ? ovText : ovImg) : '');
+    form.set('overlayMode', ovMode);
+    form.set('overlayColor', ovColor.hex);
+    form.set('overlayBg', ovBg.hex);
 
-    form.set('x', String(pos.x));
-    form.set('y', String(pos.y));
+    form.set('fontFamily', ovFontFamily);
+    form.set('fontSize', String(ovFontSize));
+    form.set('fontWeight', ovFontWeight);
 
-    const rec = await addTransform(null, form);
-    console.log('[Transform saved]', rec.transformedUrl);
+    form.set('gravity', gravity);
+    form.set('x', String(ovX));
+    form.set('y', String(ovY));
+
+    await addTransform(null, form);
     router.refresh();
   };
 
+  /* ── UI ─────────────────────────────────────────────────────────────── */
   return (
-    <div className='space-y-6'>
-      {/* ① Upload real image */}
-      <CldUploadWidget
-        uploadPreset={UPLOAD_PRESET}
-        onSuccess={(res: CloudinaryUploadWidgetResults) => {
-          if (res.info && typeof res.info !== 'string') {
-            setPublicId(res.info.public_id);
-          }
-        }}
-      >
-        {({ open }) => (
-          <Button onClick={() => open()} className='w-full'>
-            Upload product image
-          </Button>
-        )}
-      </CldUploadWidget>
-
-      {/* ⑧ Enable Generative Replace */}
-      <div className='flex items-center gap-2'>
-        <Switch
-          id='toggle-replace'
-          checked={enableReplace}
-          onCheckedChange={setEnableReplace}
-        />
-        <label htmlFor='toggle-replace' className='text-sm'>
-          Enable Generative Replace
-        </label>
+    <div className='flex flex-col md:flex-row gap-8 p-4'>
+      {/* column 1 – mode buttons */}
+      <div className='flex-shrink-0 flex flex-col items-center space-y-4 md:w-16'>
+        <button
+          onClick={() => setActive('replace')}
+          title='Generative replace'
+          className={`p-2 rounded ${
+            active === 'replace' ? 'bg-slate-200' : 'hover:bg-slate-100'
+          }`}
+        >
+          <Repeat className='w-6 h-6' />
+        </button>
+        <button
+          onClick={() => setActive('overlay')}
+          title='Overlay'
+          className={`p-2 rounded ${
+            active === 'overlay' ? 'bg-slate-200' : 'hover:bg-slate-100'
+          }`}
+        >
+          <ImageIcon className='w-6 h-6' />
+        </button>
       </div>
 
-      {/* ⑧ Enable Overlay */}
-      <div className='flex items-center gap-2'>
-        <Switch
-          id='toggle-overlay'
-          checked={enableOverlay}
-          onCheckedChange={setEnableOverlay}
-        />
-        <label htmlFor='toggle-overlay' className='text-sm'>
-          Enable Overlay
-        </label>
-      </div>
+      {/* column 2 – controls */}
+      <div className='space-y-6 md:w-1/3'>
+        <UploadButton onUpload={setPublicId} />
 
-      {/* ② Overlay choice */}
-      <div className='flex gap-2'>
-        <Button
-          variant={overlayMode === 'text' ? 'default' : 'outline'}
-          onClick={() => setOverlayMode('text')}
-        >
-          Text
-        </Button>
-        <Button
-          variant={overlayMode === 'image' ? 'default' : 'outline'}
-          onClick={() => setOverlayMode('image')}
-        >
-          Image
-        </Button>
-      </div>
-
-      {/* ③ Overlay input */}
-      {overlayMode === 'text' ? (
-        <Input
-          placeholder='e.g. CLEARANCE'
-          value={overlayText}
-          onChange={(e) => setOverlayText(e.target.value)}
-          disabled={!enableOverlay}
-        />
-      ) : (
-        <CldUploadWidget
-          uploadPreset={UPLOAD_PRESET}
-          onSuccess={(res) => {
-            if (res.info && typeof res.info !== 'string') {
-              setOverlayImgId(res.info.public_id);
-            }
-          }}
-        >
-          {({ open }) => (
-            <Button
-              variant='secondary'
-              onClick={() => open()}
-              className='w-full'
-              disabled={!enableOverlay}
-            >
-              Upload overlay image
-            </Button>
-          )}
-        </CldUploadWidget>
-      )}
-
-      {/* ⑨ Color palette (text only) */}
-      {overlayMode === 'text' && enableOverlay && (
-        <div className='flex gap-2'>
-          {COLORS.map((c) => (
-            <div
-              key={c.hex}
-              onClick={() => setOverlayColor(c)}
-              className={`${
-                c.bgClass
-              } w-6 h-6 rounded-full cursor-pointer shadow ${
-                c.hex === overlayColor.hex
-                  ? 'ring-2 ring-offset-1 ring-zinc-900'
-                  : ''
-              }`}
-              title={c.name}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* ④ Generative Replace fields */}
-      {enableReplace && (
-        <div className='flex gap-2'>
-          <Input
-            placeholder='Replace…'
-            value={replaceFrom}
-            onChange={(e) => setReplaceFrom(e.target.value)}
-          />
-          <Input
-            placeholder='with…'
-            value={replaceTo}
-            onChange={(e) => setReplaceTo(e.target.value)}
-          />
-        </div>
-      )}
-
-      {/* ⑤ Drag Area Preview */}
-      <div className='relative border rounded overflow-hidden bg-gray-100'>
-        {publicId ? (
-          <Image
-            src={buildUrl(publicId)}
-            alt='Preview'
-            width={600}
-            height={400}
-            unoptimized
-            className='w-full h-auto select-none'
+        {active === 'replace' ? (
+          <ReplaceControls
+            enabled={repEnabled}
+            from={repFrom}
+            to={repTo}
+            setEnabled={setRepEnabled}
+            setFrom={setRepFrom}
+            setTo={setRepTo}
           />
         ) : (
-          <div className='flex items-center justify-center w-full h-64 text-gray-500'>
-            No image uploaded yet
-          </div>
+          <OverlayControls
+            enabled={ovEnabled}
+            mode={ovMode}
+            text={ovText}
+            imgId={ovImg}
+            color={ovColor}
+            bgColor={ovBg}
+            fontFamily={ovFontFamily}
+            fontSize={ovFontSize}
+            fontWeight={ovFontWeight}
+            x={ovX}
+            y={ovY}
+            setEnabled={setOvEnabled}
+            setMode={setOvMode}
+            setText={setOvText}
+            setImgId={setOvImg}
+            setColor={setOvColor}
+            setBgColor={setOvBg}
+            setFontFamily={setOvFontFamily}
+            setFontSize={setOvFontSize}
+            setFontWeight={setOvFontWeight}
+            setX={setOvX}
+            setY={setOvY}
+          />
         )}
 
-        {publicId && overlayChosen && (
-          <motion.div
-            drag
-            onDrag={(_e, info: PanInfo) =>
-              setPos((prev) => ({
-                x: Math.round(prev.x + info.delta.x),
-                y: Math.round(prev.y + info.delta.y),
-              }))
-            }
-            className='absolute cursor-move'
-            style={{ left: pos.x, top: pos.y }}
-          >
-            {overlayMode === 'text' ? (
-              <span
-                className={`${overlayColor.bgClass} font-extrabold text-base px-4 py-2 rounded shadow`}
-              >
-                {overlayText}
-              </span>
-            ) : (
-              <Image
-                src={buildUrl(overlayImgId)}
-                alt='Overlay'
-                width={140}
-                height={140}
-                unoptimized
-              />
-            )}
-          </motion.div>
+        {active === 'overlay' && (
+          <PositionSelector selected={gravity} onSelect={setGravity} />
         )}
       </div>
 
-      {/* ⑥ Save */}
-      <Button disabled={!publicId} onClick={handleSave} className='w-full'>
-        Save
-      </Button>
+      {/* column 3 – preview + save */}
+      <div className='flex-1 flex flex-col space-y-4'>
+        <LivePreview baseUrl={debouncedBaseUrl} overlay={overlayPreview} />
+        <SaveButton onSave={handleSave} disabled={!publicId} />
+      </div>
     </div>
   );
 }
