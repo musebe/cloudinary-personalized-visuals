@@ -1,42 +1,41 @@
 [
   {
-    "id": "d88cd9eb-0b1a-465e-86cd-bb53c549f8cf",
-    "publicId": "ecommerce_demo/ydfezemolbjnqgx50can",
-    "transformedUrl": "https://res.cloudinary.com/hackit-africa/image/upload/e_gen_replace:from_Wall%20Frame;to_Clock/l_text:Courier_14_bold:Best%20Selling,co_rgb:FF0000,b_rgb:FFFFFF,g_north_east,x_-136,y_5/ecommerce_demo/ydfezemolbjnqgx50can.png",
-    "from": "Wall Frame",
-    "to": "Clock",
-    "overlay": "Best Selling",
-    "overlayMode": "text",
-    "pos": {
-      "x": -136,
-      "y": 5
-    },
-    "createdAt": 1747630560628
-  },
-  {
-    "id": "63225300-3c9d-4fe2-9359-71e7a1ce6ccc",
-    "publicId": "ecommerce_demo/nrppgetxay8lwioppyyl",
-    "transformedUrl": "https://res.cloudinary.com/hackit-africa/image/upload/e_gen_replace:from_Cup;to_Bowl/l_text:Arial_29_bold:Generative%20Replace,co_rgb:000000,b_rgb:FFFFFF,g_north,x_0,y_41/ecommerce_demo/nrppgetxay8lwioppyyl.png",
-    "from": "Cup",
-    "to": "Bowl",
-    "overlay": "Generative Replace",
+    "id": "96ff14b8-2a76-48aa-acaf-302d45b0cf47",
+    "publicId": "ecommerce_demo/tvqnepb8iy0xi1p3j7x6",
+    "transformedUrl": "https://res.cloudinary.com/hackit-africa/image/upload/e_gen_replace:from_Silver;to_Gold/l_text:Arial_29_bold:10%25%20Off,co_rgb:000000,b_rgb:FFFFFF,g_north,x_0,y_17/ecommerce_demo/tvqnepb8iy0xi1p3j7x6.png",
+    "from": "Silver",
+    "to": "Gold",
+    "overlay": "10% Off",
     "overlayMode": "text",
     "pos": {
       "x": 0,
-      "y": 41
+      "y": 17
     },
-    "createdAt": 1747630307072
+    "createdAt": 1747639116801
   },
   {
-    "id": "d2909f5d-332c-436c-a4ae-53a6af4a8785",
-    "publicId": "ecommerce_demo/byj84ayphewptfvkzgyn",
-    "transformedUrl": "https://res.cloudinary.com/hackit-africa/image/upload/l_text:Times_30_bold:Best%20selling,co_rgb:000000,b_rgb:FF0000,g_north,x_-8,y_21/ecommerce_demo/byj84ayphewptfvkzgyn.png",
-    "overlay": "Best selling",
+    "id": "af9b32bc-112b-4726-966b-d9d125d2de80",
+    "publicId": "ecommerce_demo/ranclielqsemwuv36pf5",
+    "transformedUrl": "https://res.cloudinary.com/hackit-africa/image/upload/l_text:Arial_22_bold:Clearance%20Sale,co_rgb:FFFFFF,b_rgb:0000FF,g_north,x_0,y_36/ecommerce_demo/ranclielqsemwuv36pf5.png",
+    "overlay": "Clearance Sale",
     "overlayMode": "text",
     "pos": {
-      "x": -8,
-      "y": 21
+      "x": 0,
+      "y": 36
     },
-    "createdAt": 1747630201201
+    "createdAt": 1747639018248
+  },
+  {
+    "id": "168d878b-a124-4839-bcac-429845af763b",
+    "publicId": "ecommerce_demo/dniyr4mx4nqaa1djhsaw",
+    "transformedUrl": "https://res.cloudinary.com/hackit-africa/image/upload/e_gen_replace:from_Cup;to_Bowl/ecommerce_demo/dniyr4mx4nqaa1djhsaw.png",
+    "from": "Cup",
+    "to": "Bowl",
+    "overlayMode": "text",
+    "pos": {
+      "x": 0,
+      "y": 0
+    },
+    "createdAt": 1747638900917
   }
 ]

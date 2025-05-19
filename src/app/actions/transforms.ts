@@ -1,3 +1,5 @@
+// src/app/actions/transforms.ts
+
 'use server';
 
 import crypto from 'node:crypto';
@@ -9,12 +11,13 @@ export async function addTransform(
     _prev: TransformRecord | null,
     data: FormData
 ): Promise<TransformRecord> {
-    /* ── grab & coerce form values ──────────────────────────────────────── */
+    /* ── basic fields ────────────────────────────────────────────────── */
     const publicId = data.get('publicId') as string;
-
     const from = (data.get('from') as string) || undefined;
     const to = (data.get('to') as string) || undefined;
+    const version = Number(data.get('version') ?? 0);
 
+    /* ── overlay + style ─────────────────────────────────────────────── */
     const overlay = (data.get('overlay') as string) || undefined;
     const overlayMode =
         (data.get('overlayMode') as string) === 'image' ? 'image' : 'text';
@@ -31,7 +34,7 @@ export async function addTransform(
     const fontWeight =
         (data.get('fontWeight') as string) === 'normal' ? 'normal' : 'bold';
 
-    /* ── build full transformation segment ─────────────────────────────── */
+    /* ── build Cloudinary transformation segment ────────────────────── */
     const segment = buildTransform({
         from,
         to,
@@ -47,12 +50,13 @@ export async function addTransform(
         fontWeight,
     });
 
-    /* ── final Cloudinary URL ───────────────────────────────────────────── */
+    /* ── final URL; append `?v=` so it matches the preview exactly ───── */
     const transformedUrl =
         `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}` +
-        `/image/upload/${segment}${publicId}.png`;
+        `/image/upload/${segment}${publicId}.png` +
+        (version ? `?v=${version}` : '');
 
-    /* ── persist & return record ────────────────────────────────────────── */
+    /* ── persist & return ───────────────────────────────────────────── */
     const record: TransformRecord = {
         id: crypto.randomUUID(),
         publicId,

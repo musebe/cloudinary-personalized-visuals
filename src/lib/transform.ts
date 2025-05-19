@@ -1,8 +1,10 @@
+// src/lib/transform.ts
+
 /**
  * Build the Cloudinary transformation segment.
  *
- * ▸ Generative Replace (e_gen_replace)  
- * ▸ Optional text or image overlay, with colour, bg, gravity & offsets
+ * ▸ Generative Replace (e_gen_replace)
+ * ▸ Optional text or image overlay
  */
 export function buildTransform({
     /* generative replace */
@@ -40,14 +42,14 @@ export function buildTransform({
 }) {
     const chain: string[] = [];
 
-    /* ① generative replace ------------------------------------------------ */
+    /* ① generative replace */
     if (from && to) {
         chain.push(
             `e_gen_replace:from_${encodeURIComponent(from)};to_${encodeURIComponent(to)}`
         );
     }
 
-    /* ② overlay ----------------------------------------------------------- */
+    /* ② overlay */
     if (overlay) {
         if (overlayMode === 'text') {
             chain.push(

@@ -31,7 +31,6 @@ interface LivePreviewProps {
   };
 }
 
-/* gravity → anchor */
 const GRAVITY_TO_CLASS: Record<Gravity, string> = {
   north_west: 'items-start justify-start',
   north: 'items-start justify-center',
@@ -47,7 +46,6 @@ const GRAVITY_TO_CLASS: Record<Gravity, string> = {
 export function LivePreview({ baseUrl, overlay }: LivePreviewProps) {
   return (
     <div className='relative w-full h-[400px] rounded-lg border bg-gray-50 overflow-hidden'>
-      {/* 1. Render image with object-contain so we never crop the photo. */}
       {baseUrl && (
         <Image
           src={baseUrl}
@@ -58,21 +56,15 @@ export function LivePreview({ baseUrl, overlay }: LivePreviewProps) {
         />
       )}
 
-      {/* 2. Flex wrapper exactly matches the visible image box */}
       {overlay && (
         <div
           className={`absolute inset-0 flex ${
             GRAVITY_TO_CLASS[overlay.gravity]
           }`}
-          style={{
-            pointerEvents: 'none', // ignore clicks
-          }}
+          style={{ pointerEvents: 'none' }}
         >
-          {/* account for X/Y offset */}
           <div
-            style={{
-              transform: `translate(${overlay.x}px, ${overlay.y}px)`,
-            }}
+            style={{ transform: `translate(${overlay.x}px,${overlay.y}px)` }}
           >
             {overlay.mode === 'text' && overlay.text ? (
               <motion.span

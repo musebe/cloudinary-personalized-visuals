@@ -11,8 +11,8 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
 
   const links = [
-    { label: 'Home', href: '/' },
-    { label: 'About Us', href: '/about' },
+    { label: '🏠 Home', href: '/' },
+    { label: '🔄 About Project', href: '/about' }, // 🔄 for "Transformations"
   ];
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function Navbar() {
             whileHover={{ scale: 1.04 }}
             transition={{ type: 'spring', stiffness: 300 }}
           >
-            Personalize Visuals
+            🛍️ GenCommerce
           </motion.span>
         </Link>
 
